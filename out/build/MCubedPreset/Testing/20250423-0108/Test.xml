@@ -2,7 +2,7 @@
 <Site BuildName="Win32-MSBuild"
 	BuildStamp="20250423-0108-Experimental"
 	Name="Jason-PC"
-	Generator="ctest-3.30.5-msvc23"
+	Generator="ctest-4.0.1"
 	CompilerName="C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.43.34808/bin/Hostx86/x64/cl.exe"
 	CompilerVersion="19.43.34809.0"
 	OSName="Windows"
@@ -15,6 +15,7 @@
 	VendorID="Advanced Micro Devices"
 	FamilyID="15"
 	ModelID="1"
+	ModelName="AMD Ryzen 5 5600X 6-Core Processor             "
 	ProcessorCacheSize="64"
 	NumberOfLogicalCPU="12"
 	NumberOfPhysicalCPU="6"
@@ -24,11 +25,11 @@
 	ProcessorClockFrequency="4400"
 	>
 	<Testing>
-		<StartDateTime>Apr 22 21:08 Eastern Daylight Time</StartDateTime>
-		<StartTestTime>1745370486</StartTestTime>
+		<StartDateTime>Apr 22 21:17 Eastern Daylight Time</StartDateTime>
+		<StartTestTime>1745371067</StartTestTime>
 		<TestList/>
-		<EndDateTime>Apr 22 21:08 Eastern Daylight Time</EndDateTime>
-		<EndTestTime>1745370486</EndTestTime>
+		<EndDateTime>Apr 22 21:17 Eastern Daylight Time</EndDateTime>
+		<EndTestTime>1745371067</EndTestTime>
 		<ElapsedMinutes>0</ElapsedMinutes>
 	</Testing>
 </Site>
