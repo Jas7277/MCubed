@@ -1,15 +1,38 @@
 package jas7277.GUI;
 
-import jas7277.Core.EventController;
-import jas7277.Utilities.ConsoleHelper;
-import jas7277.Utilities.ServerInfo;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.Objects;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+
+import jas7277.Core.EventController;
+import jas7277.Utilities.ServerInfo;
 
 public class Frame implements Runnable {
     private JTextArea consoleArea;
@@ -210,6 +233,8 @@ public class Frame implements Runnable {
         commandPanel.add(commandField, BorderLayout.CENTER);
         commandPanel.add(sendButton, BorderLayout.EAST);
         rightPanel.add(commandPanel, BorderLayout.SOUTH);
+
+        sendButton.addActionListener(e -> EventController.SendButtonClicked(consoleArea, commandField));
 
         // Split Pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);

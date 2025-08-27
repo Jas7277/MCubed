@@ -1,11 +1,11 @@
 package jas7277.Core;
 
-import jas7277.Utilities.ConsoleHelper;
-import jas7277.Utilities.FileManager;
-import jas7277.Utilities.ServerInfo;
-
-import javax.swing.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,6 +13,20 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+
+import jas7277.Utilities.ConsoleHelper;
+import jas7277.Utilities.FileManager;
+import jas7277.Utilities.ServerInfo;
 
 public class EventController {
     private static ArrayList<ServerInfo> servers;
@@ -211,5 +225,13 @@ public class EventController {
 
     public static void RestartServer(JTextArea consoleArea) {
         StopServer(consoleArea);
+    }
+
+    public static void SendButtonClicked(JTextArea consoleArea, JTextField commandField) {
+        if (serverProcess != null) {
+            ConsoleHelper helper = new ConsoleHelper(consoleArea, serverProcess);
+            helper.SendCommand(commandField.getText() + "\n");
+            commandField.setText("");
+        }
     }
 }
