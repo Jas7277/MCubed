@@ -210,8 +210,11 @@ public class Frame implements Runnable {
             deleteButton.setEnabled(existsAndValid);
         }).start();
 
+        JButton openFileExplorer = new JButton("Open Server Folder");
+        openFileExplorer.addActionListener(e -> controller.OpenFileExplorer("servers/" + serverType.getSelectedItem() + "/" + versionDropdown.getSelectedItem()));
+
         filePanel.add(downloadButton);
-        filePanel.add(new JButton("Open Server Folder"));
+        filePanel.add(openFileExplorer);
         filePanel.add(Box.createVerticalStrut(5));
         filePanel.add(deleteButton);
         filePanel.add(progressBar);

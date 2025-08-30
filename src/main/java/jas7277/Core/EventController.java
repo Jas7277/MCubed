@@ -1,5 +1,6 @@
 package jas7277.Core;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -29,11 +30,14 @@ import jas7277.Utilities.FileManager;
 import jas7277.Utilities.ServerInfo;
 
 public class EventController {
+    //region Variables
     private  ArrayList<ServerInfo> servers;
     private Process serverProcess;
     private boolean shouldRestart;
     private boolean shouldStop;
+    //endregion
 
+    //region Public Methods
     public void DownloadButtonClicked(ServerInfo server, JProgressBar progressBar, JButton[] actionButtons) {
         new SwingWorker<Void, Integer>() {
             @Override
@@ -243,4 +247,18 @@ public class EventController {
             commandField.setText("");
         }
     }
+
+    public void OpenFileExplorer(String path) {
+        try {
+            File directory = new File(path);
+            if (directory.exists() && directory.isDirectory()) {
+                Desktop.getDesktop().open(directory);
+            } else {
+                System.out.println("Directory does not exist!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    //endregion
 }
