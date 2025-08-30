@@ -24,9 +24,7 @@ public class ConsoleHelper {
     }
 
     public void Clear() {
-        SwingUtilities.invokeLater(() -> {
-            consoleArea.setText(null);
-        });
+        SwingUtilities.invokeLater(() -> consoleArea.setText(null));
     }
 
     public void SendCommand(String command) {

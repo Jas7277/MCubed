@@ -10,16 +10,19 @@ import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.swing.*;
 
 public class FileManager {
     private static final String manifest_url = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
     private static final String manifest_filename = "servers.json";
 
     public static void DownloadFile(String url, String file, Consumer<Integer> onProgress) throws IOException {
-        URL link = new URL(url);
+        URL link = URI.create(url).toURL();
         HttpURLConnection conn = (HttpURLConnection) link.openConnection();
         conn.setConnectTimeout(10_000);
         conn.setReadTimeout(15_000);
@@ -46,7 +49,7 @@ public class FileManager {
                 totalRead += bytesRead;
 
                 if (onProgress != null) {
-                    int percent = (int) ((totalRead * 100) / contentLength);
+                    int percent = (totalRead * 100) / contentLength;
                     onProgress.accept(percent);
                 }
             }
@@ -64,7 +67,7 @@ public class FileManager {
         JsonNode root = objectMapper.readTree(Paths.get(jsonFile).toFile());
         JsonNode versionsNode = root.path("versions");
 
-        ArrayList<ServerInfo> serversList = new ArrayList<ServerInfo>();
+        ArrayList<ServerInfo> serversList = new ArrayList<>();
 
         for (JsonNode versionNode : versionsNode) {
             String id = versionNode.path("id").asText();
@@ -72,7 +75,7 @@ public class FileManager {
             if (!ContainsLetterRegex(id)) {
                 String jsonUrl = versionNode.path("url").asText();
 
-                serversList.add(new ServerInfo(id, jsonUrl, GetDownloadFromServerJson(jsonUrl)));
+                serversList.add(new ServerInfo(id, GetDownloadFromServerJson(jsonUrl)));
             }
         }
 
@@ -110,17 +113,25 @@ public class FileManager {
         }
     }
 
-    public void DeleteDirectoryRecursively(Path path) throws IOException {
+    public void DeleteDirectoryRecursively(JFrame frame, Path path) {
         if (!Files.exists(path)) return;
-        Files.walk(path)
-                .sorted(Comparator.reverseOrder()) // Delete children before parents
-                .forEach(p -> {
-                    try {
-                        Files.delete(p);
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                });
+        try (Stream<Path> files = Files.walk(path)){
+            files.sorted(Comparator.reverseOrder()) // Delete children before parents
+                    .forEach(p -> {
+                        try {
+                            Files.delete(p);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(
+                    frame,
+                    "Failed to delete the server folder: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     private static boolean ContainsLetterRegex(String str) {

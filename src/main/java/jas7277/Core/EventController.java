@@ -6,13 +6,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -41,8 +39,8 @@ public class EventController {
     public void DownloadButtonClicked(ServerInfo server, JProgressBar progressBar, JButton[] actionButtons) {
         new SwingWorker<Void, Integer>() {
             @Override
-            protected Void doInBackground() throws Exception {
-                Path path = Paths.get("servers/Vanilla/" + server.getId());
+            protected Void doInBackground() {
+                Path path = Paths.get("servers/Vanilla/" + server.id());
 
                 try {
                     Files.createDirectories(path);
@@ -52,10 +50,10 @@ public class EventController {
                     File file = new File(name);
 
                     if (!file.exists()) {
-                        FileManager.DownloadFile(server.getDownloadUrl(), name, this::publish);
+                        FileManager.DownloadFile(server.downloadUrl(), name, this::publish);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.err.println("Error writing the new server JAR file!");
                 }
                 return null;
             }
@@ -92,7 +90,7 @@ public class EventController {
 
             int count = 0;
             for (ServerInfo server : servers) {
-                versions[count] = server.getId();
+                versions[count] = server.id();
                 count++;
             }
 
@@ -105,7 +103,7 @@ public class EventController {
 
     public ServerInfo SelectedServer(String id) {
         for (ServerInfo server : servers) {
-            if (server.getId().equals(id)) {
+            if (server.id().equals(id)) {
                 return server;
             }
         }
@@ -138,10 +136,10 @@ public class EventController {
 
         new SwingWorker<Void, Void>() {
             @Override
-            protected Void doInBackground() throws Exception {
+            protected Void doInBackground() {
                 try {
                     ProcessBuilder builder = new ProcessBuilder(
-                            "java", "-jar", "server.jar", "nogui"
+                            "java", "-Xmx" + RAM + "M", "-Xms" + RAM + "M", "-jar", "server.jar", "nogui"
                     );
                     builder.directory(new File(serverDir));
                     builder.redirectErrorStream(true);
@@ -205,23 +203,14 @@ public class EventController {
         );
 
         if (choice == JOptionPane.YES_OPTION) {
-            try {
-                FileManager manager = new FileManager();
-                manager.DeleteDirectoryRecursively(new File(serverDir).toPath());
-                JOptionPane.showMessageDialog(
-                        frame,
-                        "Server folder deleted successfully.",
-                        "Deleted",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(
-                        frame,
-                        "Failed to delete the server folder: " + e.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-            }
+            FileManager manager = new FileManager();
+            manager.DeleteDirectoryRecursively(frame, new File(serverDir).toPath());
+            JOptionPane.showMessageDialog(
+                    frame,
+                    "Server folder deleted successfully.",
+                    "Deleted",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
         }
     }
 
@@ -257,7 +246,9 @@ public class EventController {
                 System.out.println("Directory does not exist!");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error opening the file explorer!");
+        } catch (UnsupportedOperationException e) {
+            System.err.println("The current platform does not support the Desktop module!");
         }
     }
     //endregion

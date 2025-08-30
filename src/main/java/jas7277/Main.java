@@ -8,9 +8,6 @@ import jas7277.Utilities.FileManager;
 public class Main {
     public static void main(String[] args) {
         FileManager.DownloadManifest();
-
-
-
         SwingUtilities.invokeLater(new Frame());
     }
 }

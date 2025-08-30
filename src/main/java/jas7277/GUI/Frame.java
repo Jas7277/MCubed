@@ -103,7 +103,7 @@ public class Frame implements Runnable {
         JButton stopButton = new JButton("Stop Server");
         JButton restartButton = new JButton("Restart Server");
 
-        restartButton.addActionListener(e -> controller.RestartServer(consoleArea));
+        restartButton.addActionListener(_ -> controller.RestartServer(consoleArea));
 
         controlsPanel.add(startButton);
         controlsPanel.add(stopButton);
@@ -172,15 +172,13 @@ public class Frame implements Runnable {
 
         deleteButton.setForeground(Color.RED);
 
-        deleteButton.addActionListener(e -> {
-            controller.DeleteServer(frame, (String) serverType.getSelectedItem(), (String) versionDropdown.getSelectedItem());
-        });
+        deleteButton.addActionListener(_ -> controller.DeleteServer(frame, (String) serverType.getSelectedItem(), (String) versionDropdown.getSelectedItem()));
 
         deleteButton.setEnabled(false);
 
         JButton downloadButton = new JButton("Download Server JAR");
 
-        downloadButton.addActionListener(e -> {
+        downloadButton.addActionListener(_ -> {
             ServerInfo server = controller.SelectedServer((String) versionDropdown.getSelectedItem());
 
             startButton.setEnabled(false);
@@ -198,7 +196,7 @@ public class Frame implements Runnable {
 
         File baseDir = new File("servers/");
 
-        new javax.swing.Timer(1000, e -> {
+        new javax.swing.Timer(1000, _ -> {
             String type = (String) serverType.getSelectedItem();
             String version = (String) versionDropdown.getSelectedItem();
 
@@ -211,7 +209,7 @@ public class Frame implements Runnable {
         }).start();
 
         JButton openFileExplorer = new JButton("Open Server Folder");
-        openFileExplorer.addActionListener(e -> controller.OpenFileExplorer("servers/" + serverType.getSelectedItem() + "/" + versionDropdown.getSelectedItem()));
+        openFileExplorer.addActionListener(_ -> controller.OpenFileExplorer("servers/" + serverType.getSelectedItem() + "/" + versionDropdown.getSelectedItem()));
 
         filePanel.add(downloadButton);
         filePanel.add(openFileExplorer);
@@ -233,7 +231,7 @@ public class Frame implements Runnable {
         rightPanel.add(consoleScroll, BorderLayout.CENTER);
 
 
-        stopButton.addActionListener(e -> controller.StopServer(consoleArea));
+        stopButton.addActionListener(_ -> controller.StopServer(consoleArea));
 
         JPanel commandPanel = new JPanel(new BorderLayout());
         JTextField commandField = new JTextField();
@@ -242,7 +240,7 @@ public class Frame implements Runnable {
         commandPanel.add(sendButton, BorderLayout.EAST);
         rightPanel.add(commandPanel, BorderLayout.SOUTH);
 
-        sendButton.addActionListener(e -> controller.SendButtonClicked(consoleArea, commandField));
+        sendButton.addActionListener(_ -> controller.SendButtonClicked(consoleArea, commandField));
 
         // Split Pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
@@ -252,7 +250,7 @@ public class Frame implements Runnable {
         JLabel statusBar = new JLabel("Server stopped");
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        startButton.addActionListener(e -> controller.StartServer(new JButton[]{startButton, downloadButton, deleteButton}, (int) RAM.getValue(), progressBar, (String) serverType.getSelectedItem(), (String) versionDropdown.getSelectedItem(), autoEulaCheck, consoleArea));
+        startButton.addActionListener(_ -> controller.StartServer(new JButton[]{startButton, downloadButton, deleteButton}, (int) RAM.getValue(), progressBar, (String) serverType.getSelectedItem(), (String) versionDropdown.getSelectedItem(), autoEulaCheck, consoleArea));
 
         frame.add(splitPane, BorderLayout.CENTER);
         frame.add(statusBar, BorderLayout.SOUTH);
