@@ -29,10 +29,12 @@ import jas7277.Utilities.FileManager;
 import jas7277.Utilities.ServerInfo;
 
 public class EventController {
-    private static ArrayList<ServerInfo> servers;
-    public static Process serverProcess;
+    private  ArrayList<ServerInfo> servers;
+    private Process serverProcess;
+    private boolean shouldRestart;
+    private boolean shouldStop;
 
-    public static void DownloadButtonClicked(ServerInfo server, JProgressBar progressBar, JButton downloadButton, JButton startButton, JButton stopButton, JButton restartButton) {
+    public void DownloadButtonClicked(ServerInfo server, JProgressBar progressBar, JButton[] actionButtons) {
         new SwingWorker<Void, Integer>() {
             @Override
             protected Void doInBackground() throws Exception {
@@ -71,16 +73,15 @@ public class EventController {
                 progressBar.setString("Download complete");
                 progressBar.setStringPainted(true);
 
-                downloadButton.setEnabled(true);
-                startButton.setEnabled(true);
-                stopButton.setEnabled(true);
-                restartButton.setEnabled(true);
+                for (JButton button : actionButtons) {
+                    button.setEnabled(true);
+                }
                 progressBar.setVisible(false);
             }
         }.execute();
     }
 
-    public static String[] GetServerVersions() {
+    public String[] GetServerVersions() {
         try {
             servers = FileManager.GetServersFromFile("servers.json");
             String[] versions = new String[servers.toArray().length];
@@ -98,7 +99,7 @@ public class EventController {
         }
     }
 
-    public static ServerInfo SelectedServer(String id) {
+    public ServerInfo SelectedServer(String id) {
         for (ServerInfo server : servers) {
             if (server.getId().equals(id)) {
                 return server;
@@ -107,8 +108,14 @@ public class EventController {
         return null;
     }
 
-    public static void StartServer(JButton startButton, int RAM, JProgressBar progressBar, String serverType, String serverVersion, JCheckBox autoEulaCheck, JTextArea consoleArea) {
-        startButton.setEnabled(false);
+    public void StartServer(JButton[] actionButtons, int RAM, JProgressBar progressBar, String serverType, String serverVersion, JCheckBox autoEulaCheck, JTextArea consoleArea) {
+        shouldRestart = false;
+        shouldStop = false;
+
+        for (JButton button : actionButtons) {
+            button.setEnabled(false);
+        }
+
         progressBar.setIndeterminate(true);
         progressBar.setString("Starting server...");
 
@@ -166,13 +173,23 @@ public class EventController {
             @Override
             protected void done() {
                 progressBar.setIndeterminate(false);
-                progressBar.setString("Server stopped");
-                startButton.setEnabled(true);
+
+                if (shouldRestart) {
+                    StartServer(actionButtons, RAM, progressBar, serverType, serverVersion, autoEulaCheck, consoleArea);
+                }
+
+                if (shouldStop) {
+                    progressBar.setString("Server stopped");
+
+                    for (JButton button : actionButtons) {
+                        button.setEnabled(true);
+                    }
+                }
             }
         }.execute();
     }
 
-    public static void DeleteServer(JFrame frame, String serverType, String serverVersion) {
+    public void DeleteServer(JFrame frame, String serverType, String serverVersion) {
         String serverDir = "servers/" + serverType + "/" + serverVersion;
 
         int choice = JOptionPane.showConfirmDialog(
@@ -185,7 +202,8 @@ public class EventController {
 
         if (choice == JOptionPane.YES_OPTION) {
             try {
-                deleteDirectoryRecursively(new File(serverDir).toPath());
+                FileManager manager = new FileManager();
+                manager.DeleteDirectoryRecursively(new File(serverDir).toPath());
                 JOptionPane.showMessageDialog(
                         frame,
                         "Server folder deleted successfully.",
@@ -203,31 +221,22 @@ public class EventController {
         }
     }
 
-    private static void deleteDirectoryRecursively(Path path) throws IOException {
-        if (!Files.exists(path)) return;
-        Files.walk(path)
-                .sorted(Comparator.reverseOrder()) // Delete children before parents
-                .forEach(p -> {
-                    try {
-                        Files.delete(p);
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                });
-    }
-
-    public static void StopServer(JTextArea consoleArea) {
+    public void StopServer(JTextArea consoleArea) {
         if (serverProcess != null) {
             ConsoleHelper helper = new ConsoleHelper(consoleArea, serverProcess);
             helper.SendCommand("stop\n");
+            shouldStop = true;
         }
     }
 
-    public static void RestartServer(JTextArea consoleArea) {
-        StopServer(consoleArea);
+    public void RestartServer(JTextArea consoleArea) {
+        shouldRestart = true;
+
+        ConsoleHelper helper = new ConsoleHelper(consoleArea, serverProcess);
+        helper.SendCommand("stop\n");
     }
 
-    public static void SendButtonClicked(JTextArea consoleArea, JTextField commandField) {
+    public void SendButtonClicked(JTextArea consoleArea, JTextField commandField) {
         if (serverProcess != null) {
             ConsoleHelper helper = new ConsoleHelper(consoleArea, serverProcess);
             helper.SendCommand(commandField.getText() + "\n");

@@ -2,8 +2,11 @@ package jas7277.Utilities;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -105,6 +108,19 @@ public class FileManager {
         } catch (IOException e) {
             System.err.println("Error retrieving the version_manifest.json!");
         }
+    }
+
+    public void DeleteDirectoryRecursively(Path path) throws IOException {
+        if (!Files.exists(path)) return;
+        Files.walk(path)
+                .sorted(Comparator.reverseOrder()) // Delete children before parents
+                .forEach(p -> {
+                    try {
+                        Files.delete(p);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
     }
 
     private static boolean ContainsLetterRegex(String str) {

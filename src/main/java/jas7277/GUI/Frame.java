@@ -36,9 +36,12 @@ import jas7277.Utilities.ServerInfo;
 
 public class Frame implements Runnable {
     private JTextArea consoleArea;
+    private EventController controller;
 
     @Override
     public void run() {
+        controller = new EventController();
+
         JFrame frame = new JFrame("MCubed");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowListener() {
@@ -100,6 +103,8 @@ public class Frame implements Runnable {
         JButton stopButton = new JButton("Stop Server");
         JButton restartButton = new JButton("Restart Server");
 
+        restartButton.addActionListener(e -> controller.RestartServer(consoleArea));
+
         controlsPanel.add(startButton);
         controlsPanel.add(stopButton);
         controlsPanel.add(restartButton);
@@ -126,7 +131,7 @@ public class Frame implements Runnable {
         settingsPanel.add(new JLabel("Version:"), gbc);
 
         gbc.gridx = 1;
-        JComboBox<String> versionDropdown = new JComboBox<>(Objects.requireNonNull(EventController.GetServerVersions()));
+        JComboBox<String> versionDropdown = new JComboBox<>(Objects.requireNonNull(controller.GetServerVersions()));
         settingsPanel.add(versionDropdown, gbc);
 
         gbc.gridx = 0;
@@ -168,7 +173,7 @@ public class Frame implements Runnable {
         deleteButton.setForeground(Color.RED);
 
         deleteButton.addActionListener(e -> {
-            EventController.DeleteServer(frame, (String) serverType.getSelectedItem(), (String) versionDropdown.getSelectedItem());
+            controller.DeleteServer(frame, (String) serverType.getSelectedItem(), (String) versionDropdown.getSelectedItem());
         });
 
         deleteButton.setEnabled(false);
@@ -176,7 +181,7 @@ public class Frame implements Runnable {
         JButton downloadButton = new JButton("Download Server JAR");
 
         downloadButton.addActionListener(e -> {
-            ServerInfo server = EventController.SelectedServer((String) versionDropdown.getSelectedItem());
+            ServerInfo server = controller.SelectedServer((String) versionDropdown.getSelectedItem());
 
             startButton.setEnabled(false);
             stopButton.setEnabled(false);
@@ -187,7 +192,7 @@ public class Frame implements Runnable {
             progressBar.setString("Downloading...");
 
             if (server != null){
-                EventController.DownloadButtonClicked(server, progressBar, downloadButton, startButton, stopButton, restartButton);
+                controller.DownloadButtonClicked(server, progressBar, new JButton[]{downloadButton, startButton, stopButton, restartButton});
             }
         });
 
@@ -225,7 +230,7 @@ public class Frame implements Runnable {
         rightPanel.add(consoleScroll, BorderLayout.CENTER);
 
 
-        stopButton.addActionListener(e -> EventController.StopServer(consoleArea));
+        stopButton.addActionListener(e -> controller.StopServer(consoleArea));
 
         JPanel commandPanel = new JPanel(new BorderLayout());
         JTextField commandField = new JTextField();
@@ -234,7 +239,7 @@ public class Frame implements Runnable {
         commandPanel.add(sendButton, BorderLayout.EAST);
         rightPanel.add(commandPanel, BorderLayout.SOUTH);
 
-        sendButton.addActionListener(e -> EventController.SendButtonClicked(consoleArea, commandField));
+        sendButton.addActionListener(e -> controller.SendButtonClicked(consoleArea, commandField));
 
         // Split Pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
@@ -244,7 +249,7 @@ public class Frame implements Runnable {
         JLabel statusBar = new JLabel("Server stopped");
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        startButton.addActionListener(e -> EventController.StartServer(startButton, (int) RAM.getValue(), progressBar, (String) serverType.getSelectedItem(), (String) versionDropdown.getSelectedItem(), autoEulaCheck, consoleArea));
+        startButton.addActionListener(e -> controller.StartServer(new JButton[]{startButton, downloadButton, deleteButton}, (int) RAM.getValue(), progressBar, (String) serverType.getSelectedItem(), (String) versionDropdown.getSelectedItem(), autoEulaCheck, consoleArea));
 
         frame.add(splitPane, BorderLayout.CENTER);
         frame.add(statusBar, BorderLayout.SOUTH);
@@ -254,7 +259,7 @@ public class Frame implements Runnable {
     }
 
     private void onExit() {
-        EventController.StopServer(consoleArea);
+        controller.StopServer(consoleArea);
         System.err.println("Exit");
         System.exit(0);
     }
