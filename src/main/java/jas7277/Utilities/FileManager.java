@@ -156,12 +156,19 @@ public class FileManager implements Serializable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public ArrayList<ServerInfo> ReadServerVersions() {
         try {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream("src/main/data/server-versions.ser"));
-            ArrayList<ServerInfo> arr = (ArrayList<ServerInfo>) in.readObject();
-            in.close();
-            return arr;
+            Object obj = in.readObject();
+
+            if (obj instanceof ArrayList<?>) {
+                ArrayList<ServerInfo> arr = (ArrayList<ServerInfo>) obj;
+                in.close();
+                return arr;
+            } else {
+                throw new ClassCastException("File does not contain an ArrayList");
+            }
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error reading from the server-versions.ser file!");
         }
