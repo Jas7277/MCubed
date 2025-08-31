@@ -9,10 +9,11 @@ import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
+        FileManager fileManager = new FileManager();
         File manifest = new File(FileManager.manifest_filename);
 
         if (!manifest.exists()) {
-            FileManager.DownloadManifest();
+            fileManager.DownloadManifest();
         }
 
         SwingUtilities.invokeLater(new Frame());
