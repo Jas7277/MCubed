@@ -1,5 +1,7 @@
 package jas7277.Utilities;
 
-public record ServerInfo(String id, String downloadUrl) {
+import java.io.Serializable;
+
+public record ServerInfo(String id, String downloadUrl) implements Serializable {
 
 }

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -85,24 +84,24 @@ public class EventController {
     }
 
     public String[] GetServerVersions() {
-        String[] versions = fileManager.ReadServerVersions();
+        servers = fileManager.ReadServerVersions();
+        String[] versions;
 
-        if (versions == null) {
+        if (servers == null) {
             try {
                 servers = fileManager.GetServersFromFile("servers.json");
-                versions = new String[servers.toArray().length];
-
-                int count = 0;
-                for (ServerInfo server : servers) {
-                    versions[count] = server.id();
-                    count++;
-                }
-
-                fileManager.SaveServerVersions(versions);
+                fileManager.SaveServerVersions(servers);
             } catch (IOException e) {
                 System.err.println("Error retrieving the server info! Try resetting the server manifest file");
                 return null;
             }
+        }
+
+        versions = new String[servers.toArray().length];
+        int count = 0;
+        for (ServerInfo server : servers) {
+            versions[count] = server.id();
+            count++;
         }
 
         return versions;
@@ -117,29 +116,9 @@ public class EventController {
         return null;
     }
 
-    public void StartServer(JButton[] actionButtons, int RAM, JProgressBar progressBar, String serverType, String serverVersion, JCheckBox autoEulaCheck, JTextArea consoleArea) {
-        shouldRestart = false;
-        shouldStop = false;
-
-        for (JButton button : actionButtons) {
-            button.setEnabled(false);
-        }
-
-        progressBar.setIndeterminate(true);
-        progressBar.setString("Starting server...");
-
+    public void StartServer(JButton[] actionButtons, int RAM, JProgressBar progressBar, String serverType, String serverVersion, JTextArea consoleArea) {
         String serverDir = "servers/" + serverType + "/" + serverVersion;
-        if (autoEulaCheck.isSelected()) {
-            File eulaFile = new File(serverDir, "eula.txt");
-            try (FileWriter writer = new FileWriter(eulaFile)) {
-                writer.write("eula=true\n");
-                writer.flush();
-                System.out.println("EULA accepted automatically");
-            } catch (IOException e) {
-                System.err.println("Failed to write eula.txt: " + e.getMessage());
-                return;
-            }
-        }
+        WriteEulaFile(serverDir);
 
         new SwingWorker<Void, Void>() {
             @Override
@@ -151,6 +130,16 @@ public class EventController {
                     builder.directory(new File(serverDir));
                     builder.redirectErrorStream(true);
                     serverProcess = builder.start();
+
+                    shouldRestart = false;
+                    shouldStop = false;
+
+                    for (JButton button : actionButtons) {
+                        button.setEnabled(false);
+                    }
+
+                    progressBar.setIndeterminate(true);
+                    progressBar.setString("Starting server...");
 
                     new Thread(() -> {
                         ConsoleHelper helper = new ConsoleHelper(consoleArea, serverProcess);
@@ -184,7 +173,10 @@ public class EventController {
                 progressBar.setIndeterminate(false);
 
                 if (shouldRestart) {
-                    StartServer(actionButtons, RAM, progressBar, serverType, serverVersion, autoEulaCheck, consoleArea);
+                    StartServer(actionButtons, RAM, progressBar, serverType, serverVersion, consoleArea);
+                }
+                if (shouldRestart) {
+                    StartServer(actionButtons, RAM, progressBar, serverType, serverVersion, consoleArea);
                 }
 
                 if (shouldStop) {
@@ -256,6 +248,16 @@ public class EventController {
             System.err.println("Error opening the file explorer!");
         } catch (UnsupportedOperationException e) {
             System.err.println("The current platform does not support the Desktop module!");
+        }
+    }
+    //endregion
+
+    //region Private Methods
+    private void WriteEulaFile(String serverDir) {
+        try (FileWriter writer = new FileWriter(new File(serverDir, "eula.txt"))) {
+            writer.write("eula=true\n");
+        } catch (IOException e) {
+            System.err.println("Failed to write eula.txt: " + e.getMessage());
         }
     }
     //endregion

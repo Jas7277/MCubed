@@ -145,21 +145,21 @@ public class FileManager implements Serializable {
         return m.find();
     }
 
-    public void SaveServerVersions(String[] versions) {
+    public void SaveServerVersions(ArrayList<ServerInfo> versions) {
         try {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("src/main/data/server-versions.ser"));
             out.writeObject(versions);
             out.flush();
             out.close();
         } catch (IOException e) {
-            System.err.println("Error saving the server versions to the file");
+            System.err.println("Error saving the server versions to the file: " + e.getMessage());
         }
     }
 
-    public String[] ReadServerVersions() {
+    public ArrayList<ServerInfo> ReadServerVersions() {
         try {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream("src/main/data/server-versions.ser"));
-            String[] arr = (String[]) in.readObject();
+            ArrayList<ServerInfo> arr = (ArrayList<ServerInfo>) in.readObject();
             in.close();
             return arr;
         } catch (IOException | ClassNotFoundException e) {

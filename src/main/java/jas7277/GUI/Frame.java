@@ -16,7 +16,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -152,13 +151,6 @@ public class Frame implements Runnable {
 
         RAM.setToolTipText("Max RAM based on RAM available for JVM");
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        JCheckBox autoEulaCheck = new JCheckBox("Automatically accept EULA");
-        autoEulaCheck.setToolTipText("If checked, the EULA will be accepted automatically before starting the server.");
-
-        settingsPanel.add(autoEulaCheck, gbc);
-
         // File Management
         JPanel filePanel = new JPanel(new GridLayout(0, 2, 5, 5));
         filePanel.setBorder(BorderFactory.createTitledBorder("File Management"));
@@ -251,7 +243,7 @@ public class Frame implements Runnable {
         JLabel statusBar = new JLabel("Server stopped");
         statusBar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        startButton.addActionListener(_ -> controller.StartServer(new JButton[]{startButton, downloadButton, deleteButton}, (int) RAM.getValue(), progressBar, (String) serverType.getSelectedItem(), (String) versionDropdown.getSelectedItem(), autoEulaCheck, consoleArea));
+        startButton.addActionListener(_ -> controller.StartServer(new JButton[]{startButton, downloadButton, deleteButton}, (int) RAM.getValue(), progressBar, (String) serverType.getSelectedItem(), (String) versionDropdown.getSelectedItem(), consoleArea));
 
         frame.add(splitPane, BorderLayout.CENTER);
         frame.add(statusBar, BorderLayout.SOUTH);
