@@ -17,9 +17,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.*;
 
-public class FileManager {
+public class FileManager implements Serializable {
     private static final String manifest_url = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
-    private static final String manifest_filename = "servers.json";
+    public static final String manifest_filename = "servers.json";
 
     public static void DownloadFile(String url, String file, Consumer<Integer> onProgress) throws IOException {
         URL link = URI.create(url).toURL();
@@ -143,5 +143,28 @@ public class FileManager {
         Matcher m = p.matcher(str);
 
         return m.find();
+    }
+
+    public void SaveServerVersions(String[] versions) {
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("src/main/data/server-versions.ser"));
+            out.writeObject(versions);
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            System.err.println("Error saving the server versions to the file");
+        }
+    }
+
+    public String[] ReadServerVersions() {
+        try {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream("src/main/data/server-versions.ser"));
+            String[] arr = (String[]) in.readObject();
+            in.close();
+            return arr;
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error reading from the server-versions.ser file!");
+        }
+        return null;
     }
 }

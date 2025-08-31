@@ -1,11 +1,7 @@
 package jas7277.Core;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +25,7 @@ import jas7277.Utilities.ServerInfo;
 
 public class EventController {
     //region Variables
+    private final FileManager fileManager;
     private  ArrayList<ServerInfo> servers;
     private Process serverProcess;
     private boolean shouldRestart;
@@ -36,6 +33,10 @@ public class EventController {
     //endregion
 
     //region Public Methods
+    public EventController() {
+        fileManager = new FileManager();
+    }
+
     public void DownloadButtonClicked(ServerInfo server, JProgressBar progressBar, JButton[] actionButtons) {
         new SwingWorker<Void, Integer>() {
             @Override
@@ -84,21 +85,27 @@ public class EventController {
     }
 
     public String[] GetServerVersions() {
-        try {
-            servers = FileManager.GetServersFromFile("servers.json");
-            String[] versions = new String[servers.toArray().length];
+        String[] versions = fileManager.ReadServerVersions();
 
-            int count = 0;
-            for (ServerInfo server : servers) {
-                versions[count] = server.id();
-                count++;
+        if (versions == null) {
+            try {
+                servers = FileManager.GetServersFromFile("servers.json");
+                versions = new String[servers.toArray().length];
+
+                int count = 0;
+                for (ServerInfo server : servers) {
+                    versions[count] = server.id();
+                    count++;
+                }
+
+                fileManager.SaveServerVersions(versions);
+            } catch (IOException e) {
+                System.err.println("Error retrieving the server info! Try resetting the server manifest file");
+                return null;
             }
-
-            return versions;
-        } catch (IOException e) {
-            System.err.println("Error retrieving the server info! Try resetting the server manifest file");
-            return null;
         }
+
+        return versions;
     }
 
     public ServerInfo SelectedServer(String id) {
