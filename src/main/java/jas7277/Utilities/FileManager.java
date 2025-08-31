@@ -21,7 +21,7 @@ public class FileManager implements Serializable {
     private static final String manifest_url = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
     public static final String manifest_filename = "servers.json";
 
-    public static void DownloadFile(String url, String file, Consumer<Integer> onProgress) throws IOException {
+    public void DownloadFile(String url, String file, Consumer<Integer> onProgress) throws IOException {
         URL link = URI.create(url).toURL();
         HttpURLConnection conn = (HttpURLConnection) link.openConnection();
         conn.setConnectTimeout(10_000);
@@ -61,7 +61,7 @@ public class FileManager implements Serializable {
         }
     }
 
-    public static ArrayList<ServerInfo> GetServersFromFile(String jsonFile) throws IOException {
+    public ArrayList<ServerInfo> GetServersFromFile(String jsonFile) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         JsonNode root = objectMapper.readTree(Paths.get(jsonFile).toFile());
@@ -82,7 +82,7 @@ public class FileManager implements Serializable {
         return serversList;
     }
 
-    private static String GetDownloadFromServerJson(String jsonUrl) {
+    private String GetDownloadFromServerJson(String jsonUrl) {
         try {
             DownloadFile(jsonUrl, "download.json", null);
 
@@ -99,7 +99,7 @@ public class FileManager implements Serializable {
         }
     }
 
-    public static void DownloadManifest() {
+    public void DownloadManifest() {
         File file = new File(manifest_filename);
 
         if (file.exists()) {
@@ -107,7 +107,7 @@ public class FileManager implements Serializable {
         }
 
         try {
-            FileManager.DownloadFile(manifest_url, manifest_filename, null);
+            DownloadFile(manifest_url, manifest_filename, null);
         } catch (IOException e) {
             System.err.println("Error retrieving the version_manifest.json!");
         }
@@ -134,7 +134,7 @@ public class FileManager implements Serializable {
         }
     }
 
-    private static boolean ContainsLetterRegex(String str) {
+    private boolean ContainsLetterRegex(String str) {
         if (str == null || str.isEmpty()) {
             return false;
         }

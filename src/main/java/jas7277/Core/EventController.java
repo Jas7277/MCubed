@@ -51,7 +51,7 @@ public class EventController {
                     File file = new File(name);
 
                     if (!file.exists()) {
-                        FileManager.DownloadFile(server.downloadUrl(), name, this::publish);
+                        fileManager.DownloadFile(server.downloadUrl(), name, this::publish);
                     }
                 } catch (IOException e) {
                     System.err.println("Error writing the new server JAR file!");
@@ -89,7 +89,7 @@ public class EventController {
 
         if (versions == null) {
             try {
-                servers = FileManager.GetServersFromFile("servers.json");
+                servers = fileManager.GetServersFromFile("servers.json");
                 versions = new String[servers.toArray().length];
 
                 int count = 0;

@@ -80,6 +80,7 @@ public class Frame implements Runnable {
 
             }
         });
+        frame.setResizable(false);
 
         // Menu Bar
         JMenuBar menuBar = new JMenuBar();
