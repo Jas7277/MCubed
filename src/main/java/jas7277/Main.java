@@ -2,8 +2,8 @@ package jas7277;
 
 import javax.swing.SwingUtilities;
 
-import jas7277.GUI.Frame;
-import jas7277.Utilities.FileManager;
+import jas7277.View.Frame;
+import jas7277.Model.FileManager;
 
 import java.io.File;
 

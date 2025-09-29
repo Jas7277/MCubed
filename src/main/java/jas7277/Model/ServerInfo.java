@@ -1,4 +1,4 @@
-package jas7277.Utilities;
+package jas7277.Model;
 
 import java.io.Serializable;
 
