@@ -1,6 +1,8 @@
 package jas7277.View;
 
 import jas7277.Controller.LeftPanelController;
+import jas7277.Model.ServerInfo;
+import jas7277.Model.ServerTypes;
 
 import javax.swing.*;
 import java.awt.*;
@@ -90,25 +92,6 @@ public class LeftPanel extends JPanel {
 
         JButton downloadButton = new JButton("Download Server JAR");
 
-        File baseDir = new File("servers/");
-
-        new javax.swing.Timer(1000, _ -> {
-            downloadButton.setEnabled(false);
-            deleteButton.setEnabled(false);
-            if (!serverRunning) {
-                String type = (String) serverType.getSelectedItem();
-                String version = (String) versionDropdown.getSelectedItem();
-
-                File jarFile = new File(baseDir, type + "/" + version + "/server.jar");
-
-                boolean existsAndValid = jarFile.exists() && jarFile.length() > 0;
-
-                startButton.setEnabled(existsAndValid);
-                downloadButton.setEnabled(!existsAndValid);
-                deleteButton.setEnabled(existsAndValid);
-            }
-        }).start();
-
         JButton openFileExplorer = new JButton("Open Server Folder");
 
         filePanel.add(downloadButton);
@@ -153,5 +136,37 @@ public class LeftPanel extends JPanel {
         });
 
         restartButton.addActionListener(_ -> controller.RestartServer());
+
+        File baseDir = new File("servers/");
+
+        new javax.swing.Timer(1000, _ -> {
+            downloadButton.setEnabled(false);
+            deleteButton.setEnabled(false);
+            if (!serverRunning) {
+                String type = (String) serverType.getSelectedItem();
+                String version = (String) versionDropdown.getSelectedItem();
+
+                File jarFile = new File(baseDir, type + "/" + version + "/server.jar");
+
+                boolean existsAndValid = jarFile.exists() && jarFile.length() > 0;
+
+                startButton.setEnabled(existsAndValid);
+                downloadButton.setEnabled(!existsAndValid);
+                deleteButton.setEnabled(existsAndValid);
+                openFileExplorer.setEnabled(existsAndValid);
+
+                if (openFileExplorer.getActionListeners().length == 0) {
+                    openFileExplorer.addActionListener(_ -> controller.OpenFileExplorer(baseDir + "/" + type + "/" + version));
+                }
+
+                if (deleteButton.getActionListeners().length == 0) {
+                    deleteButton.addActionListener(_ -> controller.DeleteServer(this.getParent(), baseDir + "/" + type + "/" + version));
+                }
+
+                if (downloadButton.getActionListeners().length == 0) {
+                    downloadButton.addActionListener(_ -> controller.DownloadButtonClicked(new ServerInfo(ServerTypes.VANILLA, version, "")));
+                }
+            }
+        }).start();
     }
 }

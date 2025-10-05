@@ -1,5 +1,6 @@
 package jas7277.Model;
 
+import java.awt.*;
 import java.io.*;
 import java.net.*;
 import java.nio.file.Files;
@@ -71,11 +72,13 @@ public class FileManager implements Serializable {
 
         for (JsonNode versionNode : versionsNode) {
             String id = versionNode.path("id").asText();
+            ServerTypes type = ServerTypes.VANILLA;
 
             if (!ContainsLetterRegex(id)) {
                 String jsonUrl = versionNode.path("url").asText();
 
-                serversList.add(new ServerInfo(id, GetDownloadFromServerJson(jsonUrl)));
+                serversList.add(new ServerInfo(type, id, GetDownloadFromServerJson(jsonUrl)));
+                System.out.println(id);
             }
         }
 
@@ -113,7 +116,7 @@ public class FileManager implements Serializable {
         }
     }
 
-    public void DeleteDirectoryRecursively(JFrame frame, Path path) {
+    public void DeleteDirectoryRecursively(Container frame, Path path) {
         if (!Files.exists(path)) return;
         try (Stream<Path> files = Files.walk(path)){
             files.sorted(Comparator.reverseOrder()) // Delete children before parents
