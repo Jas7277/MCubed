@@ -1,37 +1,11 @@
 package jas7277.View;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
-import java.util.Objects;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
-
-import jas7277.Controller.EventController;
-import jas7277.Model.ServerInfo;
+import javax.swing.*;
 import jas7277.Model.ServerProcesses;
 
 public class Frame implements Runnable {
@@ -77,27 +51,21 @@ public class Frame implements Runnable {
         });
         frame.setResizable(false);
 
-        // Menu Bar
-        JMenuBar menuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("File");
-        JMenu settingsMenu = new JMenu("Settings");
-        JMenu helpMenu = new JMenu("Help");
-        menuBar.add(fileMenu);
-        menuBar.add(settingsMenu);
-        menuBar.add(helpMenu);
-        frame.setJMenuBar(menuBar);
+        // Create New Server Dialog
+        JTextField nameField = new JTextField();
+        JTextField dirField = new JTextField();
 
-        // Split Pane
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new LeftPanel(), new RightPanel());
-        splitPane.setDividerLocation(300);
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Server Name:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Server Directory"));
+        panel.add(dirField);
 
-        // Status Bar
-        JLabel statusBar = new JLabel("Server stopped");
-        statusBar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        // Server tabs
+        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
+        addServerTab(tabbedPane, "new_server", new MainPanel());
 
-        frame.add(splitPane, BorderLayout.CENTER);
-        frame.add(statusBar, BorderLayout.SOUTH);
-
+        frame.add(tabbedPane, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
     }
@@ -108,5 +76,50 @@ public class Frame implements Runnable {
         }
         System.err.println("Exit");
         System.exit(0);
+    }
+
+    private void addServerTab(JTabbedPane tabbedPane, String serverName, Component comp) {
+        tabbedPane.add(comp);
+
+        JPanel tabHeader = new JPanel(new BorderLayout());
+        tabHeader.setOpaque(false);
+
+        JLabel nameLabel = new JLabel(serverName);
+        Font emojiFont = new Font("Segoe UI Emoji", Font.PLAIN, 14);
+        JButton renameButton = new JButton("✏️");
+        renameButton.setFont(emojiFont);
+        renameButton.setMargin(new Insets(4, 2, 0, -25));
+        renameButton.setBorderPainted(false);
+        renameButton.setFocusPainted(false);
+        renameButton.setContentAreaFilled(false);
+        renameButton.setToolTipText("Rename Server");
+
+        renameButton.addActionListener(e -> {
+            String newName = JOptionPane.showInputDialog(tabbedPane, "Rename server:", serverName);
+            if (newName != null && !newName.trim().isEmpty()) {
+                nameLabel.setText(newName.trim());
+            }
+        });
+
+        tabHeader.add(nameLabel, BorderLayout.CENTER);
+        tabHeader.add(renameButton, BorderLayout.EAST);
+
+        tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, tabHeader);
+
+        tabbedPane.addTab("+", null);
+        tabbedPane.addChangeListener(e -> {
+            int index = tabbedPane.getSelectedIndex();
+            if (index == tabbedPane.getTabCount() - 1) {
+                tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
+                String name = JOptionPane.showInputDialog(tabbedPane, "Enter new server name:");
+                if (name != null && !name.trim().isEmpty()) {
+                    tabbedPane.insertTab(name.trim(), null, new MainPanel(), null, tabbedPane.getTabCount() - 1);
+                    tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
+                }
+                else {
+                    tabbedPane.setSelectedIndex(0);
+                }
+            }
+        });
     }
 }

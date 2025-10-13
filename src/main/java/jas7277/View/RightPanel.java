@@ -16,6 +16,7 @@ public class RightPanel extends JPanel {
         this.setMinimumSize(new Dimension(400, 400));
         this.setPreferredSize(new Dimension(500, 400));
         consoleArea.setEditable(false);
+        consoleArea.setFocusable(false);
         JScrollPane consoleScroll = new JScrollPane(consoleArea);
         this.add(consoleScroll, BorderLayout.CENTER);
 
