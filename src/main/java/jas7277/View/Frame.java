@@ -101,13 +101,26 @@ public class Frame implements Runnable {
             }
         });
 
+        JButton deleteButton = new JButton("🗑️");
+        deleteButton.setFont(emojiFont);
+        deleteButton.setMargin(new Insets(4, 2, 0, 0));
+        deleteButton.setBorderPainted(false);
+        deleteButton.setFocusPainted(false);
+        deleteButton.setContentAreaFilled(false);
+        deleteButton.setToolTipText("Delete Server");
+
+        deleteButton.addActionListener(e -> {
+            tabbedPane.remove(tabbedPane.getSelectedIndex());
+        });
+
+        tabHeader.add(deleteButton, BorderLayout.WEST);
         tabHeader.add(nameLabel, BorderLayout.CENTER);
         tabHeader.add(renameButton, BorderLayout.EAST);
 
         tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, tabHeader);
 
         tabbedPane.addTab("+", null);
-        tabbedPane.addChangeListener(e -> {
+        tabbedPane.addChangeListener(_ -> {
             int index = tabbedPane.getSelectedIndex();
             if (index == tabbedPane.getTabCount() - 1) {
                 tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
