@@ -5,7 +5,6 @@ import jas7277.Model.FileManager;
 import jas7277.Model.ServerInfo;
 import jas7277.Model.ServerTypes;
 
-import javax.sound.midi.SysexMessage;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -117,45 +116,36 @@ public class LeftPanel extends JPanel {
         this.add(settingsPanel);
         this.add(filePanel);
 
-        startButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                serverRunning = true;
-                startButton.setEnabled(false);
-                stopButton.setEnabled(true);
-                restartButton.setEnabled(true);
-                serverType.setEnabled(false);
-                versionDropdown.setEnabled(false);
-                RAM.setEnabled(false);
-                controller.StartServer(
-                        Objects.requireNonNull(serverType.getSelectedItem()).toString(),
-                        Objects.requireNonNull(versionDropdown.getSelectedItem()).toString(),
-                        (int) RAM.getValue());
-            }
+        startButton.addActionListener(_ -> {
+            serverRunning = true;
+            startButton.setEnabled(false);
+            stopButton.setEnabled(true);
+            restartButton.setEnabled(true);
+            serverType.setEnabled(false);
+            versionDropdown.setEnabled(false);
+            RAM.setEnabled(false);
+            controller.StartServer(
+                    Objects.requireNonNull(serverType.getSelectedItem()).toString(),
+                    Objects.requireNonNull(versionDropdown.getSelectedItem()).toString(),
+                    (int) RAM.getValue());
         });
 
-        stopButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                serverRunning = false;
-                stopButton.setEnabled(false);
-                restartButton.setEnabled(false);
-                startButton.setEnabled(true);
-                serverType.setEnabled(true);
-                versionDropdown.setEnabled(true);
-                RAM.setEnabled(true);
-                controller.StopServer();
-            }
+        stopButton.addActionListener(_ -> {
+            serverRunning = false;
+            stopButton.setEnabled(false);
+            restartButton.setEnabled(false);
+            startButton.setEnabled(true);
+            serverType.setEnabled(true);
+            versionDropdown.setEnabled(true);
+            RAM.setEnabled(true);
+            controller.StopServer();
         });
 
         restartButton.addActionListener(_ -> controller.RestartServer());
 
-        resetManifest.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new FileManager().DownloadManifest();
-                getParent().repaint();
-            }
+        resetManifest.addActionListener(_ -> {
+            new FileManager().DownloadManifest();
+            getParent().repaint();
         });
 
         File baseDir = new File("servers/");

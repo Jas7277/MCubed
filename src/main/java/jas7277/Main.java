@@ -8,7 +8,7 @@ import jas7277.Model.FileManager;
 import java.io.File;
 
 public class Main {
-    static void main(String[] args) {
+    static void main() {
         FileManager fileManager = new FileManager();
         File manifest = new File(FileManager.manifest_filename);
 
