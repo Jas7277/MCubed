@@ -40,9 +40,7 @@ build/
 /.idea/
 
 # Java / Build tools
-target/
 out/
-build/
 *.class
 *.log
 
