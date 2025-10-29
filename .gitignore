@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -37,3 +38,19 @@ build/
 ### Mac OS ###
 .DS_Store
 /.idea/
+
+# Java / Build tools
+target/
+out/
+build/
+*.class
+*.log
+
+# Gradle
+.gradle/
+*.war
+*.ear
+
+# Project specific downloads
+servers/
+*.json
