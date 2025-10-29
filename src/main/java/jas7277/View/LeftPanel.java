@@ -1,9 +1,11 @@
 package jas7277.View;
 
 import jas7277.Controller.LeftPanelController;
+import jas7277.Model.FileManager;
 import jas7277.Model.ServerInfo;
 import jas7277.Model.ServerTypes;
 
+import javax.sound.midi.SysexMessage;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -77,12 +79,10 @@ public class LeftPanel extends JPanel {
         RAM.setToolTipText("Max RAM based on RAM available for JVM");
 
         // File Management
-        JPanel filePanel = new JPanel(new GridLayout(0, 2, 5, 5));
+        JPanel filePanel = new JPanel(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.NONE;
         filePanel.setBorder(BorderFactory.createTitledBorder("File Management"));
-
-        JProgressBar progressBar = new JProgressBar(0, 100);
-        progressBar.setStringPainted(true);
-        progressBar.setVisible(false);
 
         JButton deleteButton = new JButton("Delete Server");
         deleteButton.setToolTipText("Permanently delete the entire server folder.");
@@ -94,11 +94,24 @@ public class LeftPanel extends JPanel {
 
         JButton openFileExplorer = new JButton("Open Server Folder");
 
-        filePanel.add(downloadButton);
-        filePanel.add(openFileExplorer);
-        filePanel.add(Box.createVerticalStrut(5));
-        filePanel.add(deleteButton);
-        filePanel.add(progressBar);
+        JButton resetManifest = new JButton("Reload Server Data");
+        resetManifest.setToolTipText("Click this if you need to update the list of available Minecraft Server Versions");
+
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(2, 2, 2, 2);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        filePanel.add(downloadButton, gbc);
+        gbc.gridx = 1;
+        filePanel.add(openFileExplorer, gbc);
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        filePanel.add(deleteButton, gbc);
+        gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        filePanel.add(resetManifest, gbc);
 
         this.add(controlsPanel);
         this.add(settingsPanel);
@@ -137,6 +150,14 @@ public class LeftPanel extends JPanel {
 
         restartButton.addActionListener(_ -> controller.RestartServer());
 
+        resetManifest.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new FileManager().DownloadManifest();
+                getParent().repaint();
+            }
+        });
+
         File baseDir = new File("servers/");
 
         new javax.swing.Timer(1000, _ -> {
@@ -168,5 +189,11 @@ public class LeftPanel extends JPanel {
                 }
             }
         }).start();
+    }
+
+    @Override
+    public void update(Graphics g) {
+        super.update(g);
+        System.out.println("Repaint");
     }
 }

@@ -105,8 +105,8 @@ public class FileManager implements Serializable {
     public void DownloadManifest() {
         File file = new File(manifest_filename);
 
-        if (file.exists()) {
-            return;
+        if (file.exists() && !file.delete()) {
+            System.err.println("Error deleting the existing server manifest file!");
         }
 
         try {

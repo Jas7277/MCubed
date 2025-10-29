@@ -7,7 +7,7 @@ public class MainPanel extends JPanel {
     public MainPanel() {
         // Split Pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new LeftPanel(), new RightPanel());
-        splitPane.setDividerLocation(300);
+        splitPane.setDividerLocation(375);
 
         add(splitPane);
     }
