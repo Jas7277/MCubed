@@ -10,6 +10,6 @@ The following section will be updated to reflect any new versions as that change
 
 ## Reporting a Vulnerability
 In the event that a security vulnerability has been discovered, 
-please file it under the issues tab and I will work to resolve it as quickly as possible.
-Since MCubed is still in the early stages, there may be some undiscovered vulnerabilites.
+please email me at jas7277git@gmail.com to properly log the issue.
+Since MCubed is still in the early stages, there may be some undiscovered vulnerabilities.
 Please keep this in mind when using the application until it officially releases.
