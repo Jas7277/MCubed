@@ -6,12 +6,5 @@ import jas7277.Model.FileManager;
 import java.io.File;
 
 public static void main() {
-    FileManager fileManager = new FileManager();
-    File manifest = new File(FileManager.manifest_filename);
-
-    if (!manifest.exists()) {
-        fileManager.DownloadManifest();
-    }
-
     SwingUtilities.invokeLater(new Frame());
 }
