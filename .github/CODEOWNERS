@@ -1,0 +1,10 @@
+# This file specifies who should review pull requests in this repository
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# All changes require approval from the repository owner
+* @Jas7277
+
+# Optionally, add specific code owners for specific files or directories
+# For example, once you have team members:
+# src/main/java/jas7277/Model/ @Jas7277 @another-maintainer
+# src/main/java/jas7277/View/ @Jas7277 @ui-maintainer
