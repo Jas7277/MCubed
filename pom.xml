@@ -6,7 +6,7 @@
 
     <groupId>jas7277</groupId>
     <artifactId>MCubed</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>v1.0.0-beta.2</version>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
