@@ -4,6 +4,7 @@ import jas7277.Model.ConsoleHelper;
 import jas7277.Model.FileManager;
 import jas7277.Model.ServerInfo;
 import jas7277.Model.ServerProcesses;
+import jas7277.View.LeftPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +14,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class LeftPanelController {
     private final FileManager fileManager;
@@ -22,11 +25,21 @@ public class LeftPanelController {
     private String serverType;
     private String serverVersion;
     private int RAM;
+    private final LeftPanel view;
 
-    public LeftPanelController() {
+    public LeftPanelController(LeftPanel view) {
         fileManager = new FileManager();
         servers = new ArrayList<>();
         helper = new ConsoleHelper();
+        this.view = view;
+
+        if (!(new File(FileManager.manifest_filename).exists())) {
+            fileManager.DownloadManifest(() -> {
+                SwingUtilities.invokeLater(() ->
+                        refreshVersions(GetServerVersions())
+                );
+            });
+        }
     }
 
     public void StartServer(String serverType, String serverVersion, int RAM) {
@@ -71,10 +84,6 @@ public class LeftPanelController {
                 }
                 return null;
             }
-            @Override
-            protected void done() {
-
-            }
         }.execute();
     }
 
@@ -92,7 +101,6 @@ public class LeftPanelController {
     private void ResetServerInfo() {
         try {
             servers = fileManager.GetServersFromFile("servers.json");
-            fileManager.SaveServerVersions(servers);
         } catch (IOException e) {
             helper.AppendConsole("Error resetting the server info!", Color.RED);
         }
@@ -207,5 +215,22 @@ public class LeftPanelController {
                 }
             }
         }.execute();
+    }
+
+    public void refreshVersions(String[] versions) {
+        ResetServerInfo();
+        SwingUtilities.invokeLater(() -> {
+            JComboBox<String> box =  view.getVersionBox();
+            String selected = (String) box.getSelectedItem();
+
+            DefaultComboBoxModel<String> model =
+                    new DefaultComboBoxModel<>(versions);
+
+            box.setModel(model);
+
+            if (selected != null && Arrays.asList(versions).contains(selected)) {
+                box.setSelectedItem(selected);
+            }
+        });
     }
 }

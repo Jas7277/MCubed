@@ -29,7 +29,7 @@ public class LeftPanel extends JPanel {
 
     public LeftPanel() {
         super();
-        controller = new LeftPanelController();
+        controller = new LeftPanelController(this);
         serverRunning = false;
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -173,8 +173,11 @@ public class LeftPanel extends JPanel {
         restartButton.addActionListener(_ -> controller.RestartServer());
 
         resetManifest.addActionListener(_ -> {
-            new FileManager().DownloadManifest();
-            getParent().repaint();
+            new FileManager().DownloadManifest(() -> {
+                SwingUtilities.invokeLater(() ->
+                        controller.refreshVersions(controller.GetServerVersions())
+                );
+            });
         });
 
         File baseDir = new File("servers/");
@@ -208,5 +211,9 @@ public class LeftPanel extends JPanel {
                 }
             }
         }).start();
+    }
+
+    public JComboBox<String> getVersionBox() {
+        return versionDropdown;
     }
 }
