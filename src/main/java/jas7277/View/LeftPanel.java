@@ -11,30 +11,56 @@ import java.io.File;
 import java.util.Objects;
 
 public class LeftPanel extends JPanel {
-    LeftPanelController controller;
-    boolean serverRunning;
+    private final LeftPanelController controller;
+    private boolean serverRunning;
+
+    private JButton startButton;
+    private JButton stopButton;
+    private JButton restartButton;
+
+    private JComboBox<String> serverType;
+    private JComboBox<String> versionDropdown;
+    private JSpinner RAM;
+
+    private JButton deleteButton;
+    private JButton downloadButton;
+    private JButton openFileExplorer;
+    private JButton resetManifest;
+
     public LeftPanel() {
         super();
-        controller = new LeftPanelController();
+        controller = new LeftPanelController(this);
         serverRunning = false;
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
+        this.add(createControlsPanel());
+        this.add(createSettingsPanel());
+        this.add(createFilePanel());
+
+        wireEvents();
+    }
+
+    private JPanel createControlsPanel() {
         // Server Controls
         JPanel controlsPanel = new JPanel(new GridLayout(3, 1, 5, 5));
         controlsPanel.setBorder(BorderFactory.createTitledBorder("Server Controls"));
 
-        JButton startButton = new JButton("Start Server");
-        JButton stopButton = new JButton("Stop Server");
+        startButton = new JButton("Start Server");
+        stopButton = new JButton("Stop Server");
         stopButton.setEnabled(false);
-        JButton restartButton = new JButton("Restart Server");
+        restartButton = new JButton("Restart Server");
         restartButton.setEnabled(false);
 
         controlsPanel.add(startButton);
         controlsPanel.add(stopButton);
         controlsPanel.add(restartButton);
 
-        // Server Settings
+        return controlsPanel;
+    }
+
+    // Server Settings
+    private JPanel createSettingsPanel() {
         JPanel settingsPanel = new JPanel(new GridBagLayout());
         settingsPanel.setBorder(BorderFactory.createTitledBorder("Server Settings"));
 
@@ -48,7 +74,7 @@ public class LeftPanel extends JPanel {
 
         // TODO: implement multiple types of servers
         gbc.gridx = 1;
-        JComboBox<String> serverType = new JComboBox<>(new String[]{"Vanilla"});
+        serverType = new JComboBox<>(new String[]{"Vanilla"});
         settingsPanel.add(serverType, gbc);
 
         gbc.gridx = 0;
@@ -56,7 +82,7 @@ public class LeftPanel extends JPanel {
         settingsPanel.add(new JLabel("Version:"), gbc);
 
         gbc.gridx = 1;
-        JComboBox<String> versionDropdown = new JComboBox<>(Objects.requireNonNull(controller.GetServerVersions()));
+        versionDropdown = new JComboBox<>(Objects.requireNonNull(controller.GetServerVersions()));
         settingsPanel.add(versionDropdown, gbc);
 
         gbc.gridx = 0;
@@ -70,28 +96,32 @@ public class LeftPanel extends JPanel {
         int stepRam = 512;
         int defaultRAM = Math.min(2048, maxMemoryMB);
         gbc.gridx = 1;
-        JSpinner RAM = new JSpinner(new SpinnerNumberModel(defaultRAM, minRam, maxMemoryMB, stepRam));
+        RAM = new JSpinner(new SpinnerNumberModel(defaultRAM, minRam, maxMemoryMB, stepRam));
         settingsPanel.add(RAM, gbc);
 
         RAM.setToolTipText("Max RAM based on RAM available for JVM");
 
-        // File Management
+        return settingsPanel;
+    }
+
+    // File Management
+    private JPanel createFilePanel() {
         JPanel filePanel = new JPanel(new GridBagLayout());
-        gbc = new GridBagConstraints();
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.NONE;
         filePanel.setBorder(BorderFactory.createTitledBorder("File Management"));
 
-        JButton deleteButton = new JButton("Delete Server");
+        deleteButton = new JButton("Delete Server");
         deleteButton.setToolTipText("Permanently delete the entire server folder.");
 
         deleteButton.setForeground(Color.RED);
         deleteButton.setEnabled(false);
 
-        JButton downloadButton = new JButton("Download Server JAR");
+        downloadButton = new JButton("Download Server JAR");
 
-        JButton openFileExplorer = new JButton("Open Server Folder");
+        openFileExplorer = new JButton("Open Server Folder");
 
-        JButton resetManifest = new JButton("Reload Server Data");
+        resetManifest = new JButton("Reload Server Data");
         resetManifest.setToolTipText("Click this if you need to update the list of available Minecraft Server Versions");
 
         gbc.anchor = GridBagConstraints.WEST;
@@ -110,10 +140,11 @@ public class LeftPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         filePanel.add(resetManifest, gbc);
 
-        this.add(controlsPanel);
-        this.add(settingsPanel);
-        this.add(filePanel);
+        return filePanel;
+    }
 
+    // Actions handler
+    private void wireEvents() {
         startButton.addActionListener(_ -> {
             serverRunning = true;
             startButton.setEnabled(false);
@@ -142,8 +173,11 @@ public class LeftPanel extends JPanel {
         restartButton.addActionListener(_ -> controller.RestartServer());
 
         resetManifest.addActionListener(_ -> {
-            new FileManager().DownloadManifest();
-            getParent().repaint();
+            new FileManager().DownloadManifest(() -> {
+                SwingUtilities.invokeLater(() ->
+                        controller.refreshVersions(controller.GetServerVersions())
+                );
+            });
         });
 
         File baseDir = new File("servers/");
@@ -179,9 +213,7 @@ public class LeftPanel extends JPanel {
         }).start();
     }
 
-    @Override
-    public void update(Graphics g) {
-        super.update(g);
-        System.out.println("Repaint");
+    public JComboBox<String> getVersionBox() {
+        return versionDropdown;
     }
 }

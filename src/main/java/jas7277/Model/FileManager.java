@@ -82,6 +82,8 @@ public class FileManager implements Serializable {
             }
         }
 
+        SaveServerVersions(serversList);
+
         return serversList;
     }
 
@@ -102,18 +104,22 @@ public class FileManager implements Serializable {
         }
     }
 
-    public void DownloadManifest() {
-        File file = new File(manifest_filename);
+    public void DownloadManifest(Runnable onComplete) {
+        new Thread(() -> {
+            File file = new File(manifest_filename);
 
-        if (file.exists() && !file.delete()) {
-            System.err.println("Error deleting the existing server manifest file!");
-        }
+            if (file.exists() && !file.delete()) {
+                System.err.println("Error deleting the existing server manifest file!");
+            }
 
-        try {
-            DownloadFile(manifest_url, manifest_filename, null);
-        } catch (IOException e) {
-            System.err.println("Error retrieving the version_manifest.json!");
-        }
+            try {
+                DownloadFile(manifest_url, manifest_filename, null);
+            } catch (IOException e) {
+                System.err.println("Error retrieving the version_manifest.json!");
+            } finally {
+                onComplete.run();
+            }
+        }).start();
     }
 
     public void DeleteDirectoryRecursively(Container frame, Path path) {
