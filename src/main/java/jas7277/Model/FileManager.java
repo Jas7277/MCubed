@@ -18,10 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.*;
 
-public class FileManager implements Serializable {
-    private static final String manifest_url = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
-    public static final String manifest_filename = "servers.json";
+import static jas7277.Model.Constants.*;
 
+public class FileManager implements Serializable {
     public void DownloadFile(String url, String file, Consumer<Integer> onProgress) throws IOException {
         URL link = URI.create(url).toURL();
         HttpURLConnection conn = (HttpURLConnection) link.openConnection();
@@ -106,14 +105,14 @@ public class FileManager implements Serializable {
 
     public void DownloadManifest(Runnable onComplete) {
         new Thread(() -> {
-            File file = new File(manifest_filename);
+            File file = new File(MANIFEST_FILENAME);
 
             if (file.exists() && !file.delete()) {
                 System.err.println("Error deleting the existing server manifest file!");
             }
 
             try {
-                DownloadFile(manifest_url, manifest_filename, null);
+                DownloadFile(MANIFEST_URL, MANIFEST_FILENAME, null);
             } catch (IOException e) {
                 System.err.println("Error retrieving the version_manifest.json!");
             } finally {

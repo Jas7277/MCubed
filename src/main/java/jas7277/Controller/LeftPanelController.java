@@ -5,6 +5,7 @@ import jas7277.Model.FileManager;
 import jas7277.Model.ServerInfo;
 import jas7277.Model.ServerProcesses;
 import jas7277.View.LeftPanel;
+import static jas7277.Model.Constants.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +16,6 @@ import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 
 public class LeftPanelController {
     private final FileManager fileManager;
@@ -33,7 +33,7 @@ public class LeftPanelController {
         helper = new ConsoleHelper();
         this.view = view;
 
-        if (!(new File(FileManager.manifest_filename).exists())) {
+        if (!(new File(MANIFEST_FILENAME).exists())) {
             fileManager.DownloadManifest(() -> {
                 SwingUtilities.invokeLater(() ->
                         refreshVersions(GetServerVersions())
