@@ -155,7 +155,7 @@ public class FileManager implements Serializable {
 
     public void SaveServerVersions(ArrayList<ServerInfo> versions) {
         try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("src/main/data/server-versions.ser"));
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(SERVER_VERSIONS_FILE));
             out.writeObject(versions);
             out.flush();
             out.close();
@@ -167,7 +167,7 @@ public class FileManager implements Serializable {
     @SuppressWarnings("unchecked")
     public ArrayList<ServerInfo> ReadServerVersions() {
         try {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream("src/main/data/server-versions.ser"));
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(SERVER_VERSIONS_FILE));
             Object obj = in.readObject();
 
             if (obj instanceof ArrayList<?>) {

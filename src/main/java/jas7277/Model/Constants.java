@@ -9,6 +9,7 @@ public final class Constants {
     public static final String MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
     public static final String SERVER_VERSIONS_FILE = "src/main/data/server-versions.ser";
     public static final String SERVERS_DIR = "servers/";
+    public static final String VANILLA_SERVERS_DIR = SERVERS_DIR + "Vanilla/";
     public static final String SERVER_JAR_NAME = "server.jar";
     public static final String EULA_FILENAME = "eula.txt";
 

@@ -1,9 +1,6 @@
 package jas7277.Controller;
 
-import jas7277.Model.ConsoleHelper;
-import jas7277.Model.FileManager;
-import jas7277.Model.ServerInfo;
-import jas7277.Model.ServerProcesses;
+import jas7277.Model.*;
 import jas7277.View.LeftPanel;
 import static jas7277.Model.Constants.*;
 
@@ -46,7 +43,14 @@ public class LeftPanelController {
         this.serverType = serverType;
         this.serverVersion = serverVersion;
         this.RAM = RAM;
-        String serverDir = "servers/" + this.serverType + "/" + this.serverVersion;
+        String serverDir;
+
+        if (serverType.equals("Vanilla")) {
+            serverDir = VANILLA_SERVERS_DIR + "/" + serverVersion;
+        } else {
+            serverDir = "";
+        }
+
         WriteEulaFile(serverDir);
 
         new SwingWorker<Void, Void>() {
@@ -140,7 +144,7 @@ public class LeftPanelController {
     }
 
     private void WriteEulaFile(String serverDir) {
-        try (FileWriter writer = new FileWriter(new File(serverDir, "eula.txt"))) {
+        try (FileWriter writer = new FileWriter(new File(serverDir, EULA_FILENAME))) {
             writer.write("eula=true\n");
         } catch (IOException e) {
             helper.AppendConsole("Failed to write eula.txt " + e.getMessage(), Color.RED);
