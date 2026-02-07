@@ -160,25 +160,22 @@ public class LeftPanel extends JPanel {
         });
 
         stopButton.addActionListener(_ -> {
-            serverRunning = false;
-            stopButton.setEnabled(false);
-            restartButton.setEnabled(false);
-            startButton.setEnabled(true);
-            serverType.setEnabled(true);
-            versionDropdown.setEnabled(true);
-            RAM.setEnabled(true);
-            controller.StopServer();
+            if (controller.StopServer()) {
+                serverRunning = false;
+                stopButton.setEnabled(false);
+                restartButton.setEnabled(false);
+                startButton.setEnabled(true);
+                serverType.setEnabled(true);
+                versionDropdown.setEnabled(true);
+                RAM.setEnabled(true);
+            }
         });
 
         restartButton.addActionListener(_ -> controller.RestartServer());
 
-        resetManifest.addActionListener(_ -> {
-            new FileManager().DownloadManifest(() -> {
-                SwingUtilities.invokeLater(() ->
-                        controller.refreshVersions(controller.GetServerVersions())
-                );
-            });
-        });
+        resetManifest.addActionListener(_ -> new FileManager().DownloadManifest(() -> SwingUtilities.invokeLater(() ->
+                controller.refreshVersions(controller.GetServerVersions())
+        )));
 
         File baseDir = new File("servers/");
 

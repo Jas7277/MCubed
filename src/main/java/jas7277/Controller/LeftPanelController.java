@@ -23,6 +23,7 @@ public class LeftPanelController {
     private String serverVersion;
     private int RAM;
     private final LeftPanel view;
+    private boolean serverRunning;
 
     public LeftPanelController(LeftPanel view) {
         fileManager = new FileManager();
@@ -31,11 +32,9 @@ public class LeftPanelController {
         this.view = view;
 
         if (!(new File(MANIFEST_FILENAME).exists())) {
-            fileManager.DownloadManifest(() -> {
-                SwingUtilities.invokeLater(() ->
-                        refreshVersions(GetServerVersions())
-                );
-            });
+            fileManager.DownloadManifest(() -> SwingUtilities.invokeLater(() ->
+                    refreshVersions(GetServerVersions())
+            ));
         }
     }
 
@@ -77,6 +76,10 @@ public class LeftPanelController {
                             while ((line = reader.readLine()) != null) {
                                 String timestamp = "[" + LocalTime.now() + "] " + line + "\n";
                                 helper.AppendConsole(timestamp, Color.BLACK);
+
+                                if (line.contains("For help, type \"help\"")) {
+                                    serverRunning = true;
+                                }
                             }
                         } catch (IOException e) {
                             helper.AppendConsole("Failed to start server: " + e.getMessage(), Color.RED);
@@ -91,10 +94,13 @@ public class LeftPanelController {
         }.execute();
     }
 
-    public void StopServer() {
-        if (serverProcess != null && serverProcess.isAlive()) {
+    public boolean StopServer() {
+        if (serverProcess != null && serverProcess.isAlive() && serverRunning) {
             helper.SendCommand("stop\n");
+            serverRunning = false;
+            return true;
         }
+        return false;
     }
 
     public void RestartServer() {
